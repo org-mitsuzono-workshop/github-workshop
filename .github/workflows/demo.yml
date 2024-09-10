@@ -1,0 +1,46 @@
+name: Run textlint when Pull Request opened and synchronized
+
+on: 
+  pull_request:
+    types: 
+      - opened
+      - synchronize 
+    # チェック対象更新時のみ動く
+    paths: 
+      - 'playground/*.md'
+
+jobs:
+  run-textlint:
+    runs-on: ubuntu-latest
+
+    # GITHUB_TOKENを使用する場合のpermissions設定
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node.jsのセットアップ、キャッシュ設定
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ./package-lock.json
+
+      - name: package restore
+        run: |
+          npm install
+
+      # 放送禁止用語のチェック
+      - name: run textlint
+        run: |
+          npx textlint ./playground/*.md >> ./.textlint.log
+
+      # エラー時、プルリクエストのコメントに textlint の実行結果を出力（ghコマンド実行サンプル）
+      - name: add a comment to pull request
+        if: ${{ failure() }}
+        run: gh pr comment --body-file ./.textlint.log "${URL}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          URL: ${{ github.event.pull_request.html_url }}

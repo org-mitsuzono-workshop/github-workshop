@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "textlint": "^14.2.0",
+    "textlint-rule-prh": "^6.0.0"
+  }
+}

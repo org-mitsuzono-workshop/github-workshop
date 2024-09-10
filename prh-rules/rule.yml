@@ -1,0 +1,12 @@
+# prh version
+version: 1
+rules:
+
+  - expected: にせもの
+    pattern:  イカサマ
+
+  - expected: ごまかし
+    pattern:  インチキ
+
+  - expected: 銀座
+    pattern:  ザギン
